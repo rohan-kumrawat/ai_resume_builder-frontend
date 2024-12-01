@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PersonalDetailsForm from '../components/ResumeBuilder/PersonalDetailsForm';
 import SkillsForm from '../components/ResumeBuilder/SkillsForm';
+import ExperienceForm from '../components/ResumeBuilder/ExperienceForm';
+import EducationForm from '../components/ResumeBuilder/EducationForm';
 
 const ResumeBuilderPage = () => {
   const [step, setStep] = useState(1);
@@ -22,6 +24,24 @@ const ResumeBuilderPage = () => {
       case 2:
         return (
           <SkillsForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            setFormData={setFormData}
+            formData={formData}
+          />
+        );
+      case 3:
+        return (
+          <ExperienceForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            setFormData={setFormData}
+            formData={formData}
+          />
+        );
+      case 4:
+        return (
+          <EducationForm
             nextStep={nextStep}
             prevStep={prevStep}
             setFormData={setFormData}
