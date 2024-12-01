@@ -1,54 +1,53 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+});
 
 const PersonalDetailsForm = ({ nextStep, setFormData, formData }) => {
-  const [name, setName] = useState(formData.name || '');
-  const [email, setEmail] = useState(formData.email || '');
-  const [phone, setPhone] = useState(formData.phone || '');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: formData,
+    resolver: yupResolver(schema),
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormData({ ...formData, name, email, phone });
-    nextStep(); // Move to the next step
+  const onSubmit = (data) => {
+    setFormData({ ...formData, ...data });
+    nextStep();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium">Name</label>
+        <label className="block font-medium">Name</label>
         <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="w-full border px-3 py-2 rounded"
+          {...register('name')}
+          className="input-field"
+          placeholder="Enter your name"
         />
+        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Email</label>
+        <label className="block font-medium">Email</label>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full border px-3 py-2 rounded"
+          {...register('email')}
+          className="input-field"
+          placeholder="Enter your email"
         />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Phone</label>
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-          className="w-full border px-3 py-2 rounded"
-        />
+        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
       </div>
 
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        className="btn-primary"
       >
         Next
       </button>
