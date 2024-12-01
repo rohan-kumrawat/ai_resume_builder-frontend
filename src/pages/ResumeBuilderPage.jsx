@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PersonalDetailsForm from '../components/ResumeBuilder/PersonalDetailsForm';
+import SkillsForm from '../components/ResumeBuilder/SkillsForm';
 
 const ResumeBuilderPage = () => {
   const [step, setStep] = useState(1);
@@ -18,7 +19,15 @@ const ResumeBuilderPage = () => {
             formData={formData}
           />
         );
-      // We will add more steps (skills, education, experience) here later.
+      case 2:
+        return (
+          <SkillsForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            setFormData={setFormData}
+            formData={formData}
+          />
+        );
       default:
         return <h2 className="text-xl">Thank you! Form complete.</h2>;
     }
@@ -28,14 +37,6 @@ const ResumeBuilderPage = () => {
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded">
       <h1 className="text-2xl font-bold mb-4">Build Your Resume</h1>
       {renderStep()}
-      {step > 1 && (
-        <button
-          onClick={prevStep}
-          className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-        >
-          Back
-        </button>
-      )}
     </div>
   );
 };
