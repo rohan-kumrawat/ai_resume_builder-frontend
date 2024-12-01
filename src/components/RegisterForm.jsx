@@ -16,12 +16,14 @@ const RegisterForm = () => {
     
     try {
       const response = await axios.post('/auth/register', { name, email, password });
+      localStorage.setItem('token', response.data.token); // Save token to local storage
       alert('Registration successful!');
-      console.log(response.data.token); // Save token in localStorage later
+      window.location.href = '/dashboard'; // Redirect to dashboard
     } catch (err) {
       alert('Error registering. Please try again.');
     }
   };
+  
   
 
   return (

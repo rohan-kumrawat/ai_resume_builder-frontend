@@ -10,12 +10,14 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post('/auth/login', { email, password });
+      localStorage.setItem('token', response.data.token); // Save token to local storage
       alert('Login successful!');
-      console.log(response.data.token); // Save token in localStorage later
+      window.location.href = '/dashboard'; // Redirect to dashboard
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -53,5 +55,8 @@ const LoginForm = () => {
     </div>
   );
 };
+
+
+
 
 export default LoginForm;
