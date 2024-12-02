@@ -1,74 +1,72 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  jobTitle: yup.string().required('Job title is required'),
+  company: yup.string().required('Company name is required'),
+  duration: yup.string().required('Duration is required'),
+});
 
 const ExperienceForm = ({ nextStep, prevStep, setFormData, formData }) => {
-  const [experiences, setExperiences] = useState(formData.experiences || []);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: formData,
+    resolver: yupResolver(schema),
+  });
 
-  const addExperience = () => {
-    setExperiences([...experiences, { company: '', role: '', duration: '' }]);
-  };
-
-  const handleExperienceChange = (index, field, value) => {
-    const updatedExperiences = experiences.map((exp, i) =>
-      i === index ? { ...exp, [field]: value } : exp
-    );
-    setExperiences(updatedExperiences);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormData({ ...formData, experiences });
+  const onSubmit = (data) => {
+    setFormData({ ...formData, ...data });
     nextStep();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">Experience</h2>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label className="block font-medium">Job Title</label>
+        <input
+          {...register('jobTitle')}
+          className="input-field"
+          placeholder="Enter job title"
+        />
+        {errors.jobTitle && <p className="text-red-500">{errors.jobTitle.message}</p>}
+      </div>
 
-      {experiences.map((exp, index) => (
-        <div key={index} className="space-y-2 border p-4 rounded mb-4">
-          <input
-            type="text"
-            placeholder="Company"
-            value={exp.company}
-            onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Role"
-            value={exp.role}
-            onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Duration"
-            value={exp.duration}
-            onChange={(e) => handleExperienceChange(index, 'duration', e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-          />
-        </div>
-      ))}
+      <div>
+        <label className="block font-medium">Company Name</label>
+        <input
+          {...register('company')}
+          className="input-field"
+          placeholder="Enter company name"
+        />
+        {errors.company && <p className="text-red-500">{errors.company.message}</p>}
+      </div>
 
-      <button
-        type="button"
-        onClick={addExperience}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-      >
-        Add Experience
-      </button>
+      <div>
+        <label className="block font-medium">Duration</label>
+        <input
+          {...register('duration')}
+          className="input-field"
+          placeholder="Enter duration"
+        />
+        {errors.duration && <p className="text-red-500">{errors.duration.message}</p>}
+      </div>
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between">
         <button
           type="button"
           onClick={prevStep}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          className="btn-secondary"
         >
-          Back
+          Previous
         </button>
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="btn-primary"
         >
           Next
         </button>

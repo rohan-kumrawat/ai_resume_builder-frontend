@@ -1,57 +1,56 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  skills: yup
+    .array()
+    .min(1, 'At least one skill is required')
+    .of(yup.string().required('Skill cannot be empty')),
+});
 
 const SkillsForm = ({ nextStep, prevStep, setFormData, formData }) => {
-  const [skills, setSkills] = useState(formData.skills || []);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { skills: formData.skills || [''] },
+    resolver: yupResolver(schema),
+  });
 
-  const addSkill = () => {
-    setSkills([...skills, '']);
-  };
-
-  const handleSkillChange = (index, value) => {
-    const updatedSkills = skills.map((skill, i) => (i === index ? value : skill));
-    setSkills(updatedSkills);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormData({ ...formData, skills });
+  const onSubmit = (data) => {
+    setFormData({ ...formData, skills: data.skills });
     nextStep();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">Skills</h2>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label className="block font-medium">Skills</label>
+        {errors.skills && <p className="text-red-500">{errors.skills.message}</p>}
+        {Array.from({ length: 5 }).map((_, index) => (
+          <input
+            key={index}
+            {...register(`skills[${index}]`)}
+            className="input-field mb-2"
+            placeholder={`Skill ${index + 1}`}
+          />
+        ))}
+      </div>
 
-      {skills.map((skill, index) => (
-        <input
-          key={index}
-          type="text"
-          value={skill}
-          onChange={(e) => handleSkillChange(index, e.target.value)}
-          placeholder={`Skill ${index + 1}`}
-          className="w-full border px-3 py-2 rounded mb-2"
-        />
-      ))}
-
-      <button
-        type="button"
-        onClick={addSkill}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-      >
-        Add Skill
-      </button>
-
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between">
         <button
           type="button"
           onClick={prevStep}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          className="btn-secondary"
         >
-          Back
+          Previous
         </button>
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="btn-primary"
         >
           Next
         </button>
