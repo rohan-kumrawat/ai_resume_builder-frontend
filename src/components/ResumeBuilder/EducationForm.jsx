@@ -2,16 +2,18 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import API from '../../api'; // Axios instance
 
+// Validation schema
 const schema = yup.object().shape({
   degree: yup.string().required('Degree is required'),
-  institution: yup.string().required('Institution is required'),
+  institution: yup.string().required('Institution name is required'),
   graduationYear: yup
     .number()
+    .typeError('Year must be a number')
     .required('Graduation year is required')
-    .typeError('Must be a number')
-    .min(1900, 'Invalid year')
-    .max(new Date().getFullYear(), 'Cannot be in the future'),
+    .min(1900, 'Year must be after 1900')
+    .max(new Date().getFullYear(), 'Year cannot be in the future'),
 });
 
 const EducationForm = ({ nextStep, prevStep, setFormData, formData }) => {
@@ -24,9 +26,21 @@ const EducationForm = ({ nextStep, prevStep, setFormData, formData }) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    setFormData({ ...formData, ...data });
-    nextStep();
+  // Form submission
+  const onSubmit = async (data) => {
+    try {
+      // Save data to backend
+      const response = await API.post('/resume/education', {
+        education: { degree: data.degree, institution: data.institution, graduationYear: data.graduationYear },
+      });
+      console.log('Education saved:', response.data);
+
+      // Update form data and move to the next step
+      setFormData({ ...formData, ...data });
+      nextStep();
+    } catch (error) {
+      console.error('Error saving education:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -36,7 +50,7 @@ const EducationForm = ({ nextStep, prevStep, setFormData, formData }) => {
         <input
           {...register('degree')}
           className="input-field"
-          placeholder="Enter degree"
+          placeholder="Enter your degree"
         />
         {errors.degree && <p className="text-red-500">{errors.degree.message}</p>}
       </div>
@@ -46,7 +60,7 @@ const EducationForm = ({ nextStep, prevStep, setFormData, formData }) => {
         <input
           {...register('institution')}
           className="input-field"
-          placeholder="Enter institution"
+          placeholder="Enter institution name"
         />
         {errors.institution && <p className="text-red-500">{errors.institution.message}</p>}
       </div>
@@ -57,7 +71,6 @@ const EducationForm = ({ nextStep, prevStep, setFormData, formData }) => {
           {...register('graduationYear')}
           className="input-field"
           placeholder="Enter graduation year"
-          type="number"
         />
         {errors.graduationYear && <p className="text-red-500">{errors.graduationYear.message}</p>}
       </div>
