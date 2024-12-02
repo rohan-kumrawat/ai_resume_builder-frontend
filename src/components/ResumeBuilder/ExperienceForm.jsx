@@ -2,7 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import API from '../../api'; // Axios instance
 
+// Validation schema
 const schema = yup.object().shape({
   jobTitle: yup.string().required('Job title is required'),
   company: yup.string().required('Company name is required'),
@@ -19,9 +21,21 @@ const ExperienceForm = ({ nextStep, prevStep, setFormData, formData }) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    setFormData({ ...formData, ...data });
-    nextStep();
+  // Form submission
+  const onSubmit = async (data) => {
+    try {
+      // Save data to backend
+      const response = await API.post('/resume/experience', {
+        experience: { jobTitle: data.jobTitle, company: data.company, duration: data.duration },
+      });
+      console.log('Experience saved:', response.data);
+
+      // Update form data and move to the next step
+      setFormData({ ...formData, ...data });
+      nextStep();
+    } catch (error) {
+      console.error('Error saving experience:', error.response?.data || error.message);
+    }
   };
 
   return (
